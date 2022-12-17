@@ -172,18 +172,26 @@ item_set backpack_arr_by_weight(vector<item_set>& items, size_t max_weight, size
 
 //решение задачи в общем случае
 item_set backpack(long double eps, vector<item_set> items, size_t max_weight) {
+    //в случае пустого массива ответ будет соответствующий
     if (items.size() == 0) {
         return item_set();
     }
+    
+    //вычисляем приблизительный ответ
     item_set approximate_answer = backpack_greedy_algorithm(items, max_weight);
+    
+    //считаем с его помощью поправочный коэффициент
     long double k = (eps)*approximate_answer.cost / items.size();
 
+    //если стоимость можно аппроксимировать
     if (k > 1) {
         for (item_set& i : items) {
-            i.cost /= k;
+            i.cost /= k; //сокращаем стоимость
         }
     }
 
+    //чтобы определить, какую динамику будет эффектнее
+    //применить, считаем стоимость и вес всех предметов
     size_t sum_weight = 0, sum_cost = 0;
     for (item_set i : items) {
         sum_weight += i.weight;
@@ -191,11 +199,9 @@ item_set backpack(long double eps, vector<item_set> items, size_t max_weight) {
     }
 
     if (min(max_weight, sum_weight) > sum_cost) {
-        //printf("By cost\n");
         return backpack_arr_by_cost(items, max_weight, sum_cost);
     }
     else {
-        //printf("By weight\n");
         return backpack_arr_by_weight(items, max_weight, sum_weight);
     }
 }
@@ -213,21 +219,25 @@ int main() {
     int num = 0;
     item_set temp_item; //буферный предмет для считывания
     while (!cin.eof()) {
-        if (temp_item.try_scan()) { //если получилось корректно считать информацию о предмете, добавляем его в массив
-            if (temp_item.weight <= max_weight) {
+        if (temp_item.try_scan()) { //если получилось корректно считать информацию о предмете
+            if (temp_item.weight <= max_weight) { //предметы, вес которых больше максимально можно пропустить, но нужно учитывать изменение номера последующих
                 items.push_back(item_set(temp_item.weight, temp_item.cost, num, items.size()));
             }
             ++num;
         }
     }
 
+    //получаем ответ
     item_set answer = backpack(eps, items, max_weight);
 
-    //пересчитываем аппроксимированный ответ
+    //так как в ответе стоимость предметов упрощенная, 
+    //восстанавливаем стоимость по исходным данным
     answer.cost = 0;
     for (int i : answer.index) {
         answer.cost += items[i].cost;
     }
+    
+    //выводим ответ
     answer.print();
 
     return 0;
