@@ -190,7 +190,7 @@ item_set backpack(long double eps, vector<item_set> items, size_t max_weight) {
         }
     }
 
-    //чтобы определить, какую динамику будет эффектнее
+    //чтобы определить, какую динамику будет эффективнее
     //применить, считаем стоимость и вес всех предметов
     size_t sum_weight = 0, sum_cost = 0;
     for (item_set i : items) {
